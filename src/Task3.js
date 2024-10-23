@@ -8,6 +8,8 @@ function Task3() {
     let pointA = new THREE.Vector3();
     let pointB = new THREE.Vector3();
     let line ;
+    let isDrawing = false;
+
     useEffect(() => {
         const currentMount = mountRef.current;
         const scene = new THREE.Scene();
@@ -48,18 +50,27 @@ function Task3() {
         }
 
         const handleMouseDown = (event) => {
+            isDrawing = true
             let viewPortPosStartOfLine =  getMouse3DPosition(event,plane)
             line.geometry.attributes.position.setXYZ(0,viewPortPosStartOfLine.x,viewPortPosStartOfLine.y,0)
         };
         renderer.domElement.addEventListener('mousedown', handleMouseDown);
         const handleMouseMove = (event) => {
+            if (!isDrawing)
+                return;
+
             let viewPortPosEndOfLine = getMouse3DPosition(event, plane);
             if (viewPortPosEndOfLine) {
                 line.geometry.attributes.position.setXYZ(1, viewPortPosEndOfLine.x, viewPortPosEndOfLine.y, 0);
-                line.geometry.attributes.position.needsUpdate = true; // Mark the position as updated
+                line.geometry.attributes.position.needsUpdate = true;
             }
         };
         renderer.domElement.addEventListener('mousemove', handleMouseMove);
+        const handleMouseUp = () => {
+            isDrawing = false;
+        };
+        renderer.domElement.addEventListener('mouseup', handleMouseUp);
+
         const animate = () => {
             requestAnimationFrame(animate);
             line.geometry.attributes.position.needsUpdate = true;
